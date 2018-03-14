@@ -1,0 +1,28 @@
+{
+    "name": "fadion/ES",
+    "description": "Map Elasticsearch results to Eloquent models",
+    "license": "MIT",
+    "keywords": ["laravel", "elasticsearch", "eloquent"],
+    "authors": [
+        {
+            "name": "Fadion Dashi",
+            "email": "jonidashi@gmail.com",
+            "homepage": "http://www.streha.al"
+        },
+		{
+            "name": "Vikram"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "illuminate/support": "5.*",
+        "illuminate/database": "5.*",
+        "elasticsearch/elasticsearch": "~6.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Fadion\\ES": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
