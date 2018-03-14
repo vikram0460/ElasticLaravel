@@ -1,5 +1,5 @@
 {
-    "name": "Vikram/ES",
+    "name": "vikram/es",
     "description": "Map Elasticsearch results to Eloquent models",
     "license": "MIT",
     "keywords": ["laravel", "elasticsearch", "eloquent"],
