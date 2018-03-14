@@ -1,4 +1,4 @@
-<?php namespace Fadion\ES\Facades;
+<?php namespace Vikram\ES\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

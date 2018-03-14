@@ -1,4 +1,4 @@
-<?php namespace Fadion\ES;
+<?php namespace Vikram\ES;
 
 use Illuminate\Support\Facades\Config;
 use Elasticsearch\Client as ElasticSearch;

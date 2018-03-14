@@ -1,5 +1,5 @@
 {
-    "name": "fadion/ES",
+    "name": "Vikram/ES",
     "description": "Map Elasticsearch results to Eloquent models",
     "license": "MIT",
     "keywords": ["laravel", "elasticsearch", "eloquent"],
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Fadion\\ES": "src/"
+            "Vikram\\ES": "src/"
         }
     },
     "minimum-stability": "dev"

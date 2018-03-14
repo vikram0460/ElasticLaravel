@@ -1,4 +1,4 @@
-<?php namespace Fadion\ES;
+<?php namespace Vikram\ES;
 
 use Illuminate\Database\Eloquent\Collection;
 
