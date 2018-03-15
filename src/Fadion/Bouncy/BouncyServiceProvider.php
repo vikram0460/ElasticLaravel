@@ -1,4 +1,4 @@
-<?php namespace Vikram\ES;
+<?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\ServiceProvider;
 use Elasticsearch\Client as ElasticSearch;

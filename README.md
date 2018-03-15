@@ -36,16 +36,20 @@ I was inspired and most of the implementation is based on [Elasticquent](https:/
 
 ## Installation
 
+composer require vikram/es:dev-master
+
+OR
+
 - Add the package to your `composer.json` file and run `composer update`:
 ```json
 {
     "require": {
-        "fadion/bouncy": "~1.0"
+        "vikram/es": "dev-master",
     }
 }
 ```
 
-- Add the service provider to your `app/config/app.php` file, inside the `providers` array: `'Vikram\ES\BouncyServiceProvider'`
+- Add the service provider to your `app/config/app.php` file, inside the `providers` array: `'Fadion\Bouncy\BouncyServiceProvider'`
 
 - Publish the config file by running the following command in the terminal: `php artisan config:publish fadion/bouncy`
 
@@ -56,7 +60,7 @@ I was inspired and most of the implementation is based on [Elasticquent](https:/
 There's only one step to tell your models that they should use Bouncy. Just add a trait! I'll be using a fictional `Product` model for the examples.
 
 ```php
-use Vikram\ES\BouncyTrait;
+use Fadion\Bouncy\BouncyTrait;
 
 class Product extends Eloquent {
     
@@ -195,7 +199,7 @@ Mappings can be created as easily as anything you've seen until now. They are de
 
 Add mapping properties to a model:
 ```php
-use Vikram\ES\BouncyTrait;
+use Fadion\Bouncy\BouncyTrait;
 
 class Product extends Eloquent {
     
@@ -391,7 +395,7 @@ $products = Product::moreLikeThis(Array $fields, Array $ids, $minTermFreq = 1, $
 Bouncy will use your model's attributes while indexing and that should be fine for most cases. However, if you want to have control over the Elasticsearch documents structure, you can customize the fields by adding a `$documentFields` method to your model:
 
 ```php
-use Vikram\ES\BouncyTrait;
+use Fadion\Bouncy\BouncyTrait;
 
 class Product extends Eloquent {
     
@@ -415,7 +419,7 @@ If you are using a custom collection for Eloquent, you can still keep using Boun
 
 ```php
 use Illuminate\Database\Eloquent\Collection;
-use Vikram\ES\BouncyCollectionTrait;
+use Fadion\Bouncy\BouncyCollectionTrait;
 
 class MyAwesomeCollection extends Collection {
 
@@ -426,7 +430,7 @@ class MyAwesomeCollection extends Collection {
 
 ## Elasticsearch Client Facade
 
-Finally, when you'll need it, you can access Elasticsearch's native client in Laravel fashion using a Facade. For this step to work, you'll need to add an alias in `app/config/app.php` in the aliases array: `'Elastic' => 'Vikram\ES\Facades\Elastic'`.
+Finally, when you'll need it, you can access Elasticsearch's native client in Laravel fashion using a Facade. For this step to work, you'll need to add an alias in `app/config/app.php` in the aliases array: `'Elastic' => 'Fadion\Bouncy\Facades\Elastic'`.
 
 ```php
 Elastic::index();

@@ -1,4 +1,4 @@
-<?php namespace Vikram\ES;
+<?php namespace Fadion\Bouncy;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
