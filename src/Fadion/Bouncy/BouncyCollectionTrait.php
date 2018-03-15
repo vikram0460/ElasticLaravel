@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Config;
 use Elasticsearch\Client as ElasticSearch;
+use Elasticsearch\ClientBuilder;
 
 trait BouncyCollectionTrait {
 
@@ -80,7 +81,23 @@ trait BouncyCollectionTrait {
      */
     protected function getElasticClient()
     {
-        return new ElasticSearch(Config::get('elasticsearch'));
+        $configurations = Config::get('elasticsearch');
+        $retries = $configurations['retries'];
+        $hosts = $configurations['hosts'];
+        $connectionPool = $configurations['connectionPoolClass'];
+        $selector = $configurations['selectorClass'];
+        $serializer = $configurations['serializerClass'];
+        $logPath = $configurations['logPath'];
+        $logger = ClientBuilder::defaultLogger($logPath);
+        $client = ClientBuilder::create()
+                                ->setHosts($hosts)        // Set the hosts
+                                ->setConnectionPool($connectionPool)
+                                ->setSerializer($serializer)
+                                ->setSelector($selector)
+                                ->setLogger($logger)      // Set the logger with a default logger
+                                ->build();
+        
+        return $client;
     }
 
 }

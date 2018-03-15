@@ -2,12 +2,16 @@
 
 return array(
 
-    'connectionClass' => '\Elasticsearch\Connections\GuzzleConnection',
-    'connectionFactoryClass' => '\Elasticsearch\Connections\ConnectionFactory',
+    'registeredNamespaces' => [
+        'connectionClass' => '\Elasticsearch\Connections\GuzzleConnection',
+        'connectionFactoryClass' => '\Elasticsearch\Connections\ConnectionFactory',
+    ],
     'connectionPoolClass' => '\Elasticsearch\ConnectionPool\StaticNoPingConnectionPool',
-    'selectorClass' => '\Elasticsearch\ConnectionPool\Selectors\RoundRobinSelector',
+    'selectorClass' => '\Elasticsearch\ConnectionPool\Selectors\StickyRoundRobinSelector',
     'serializerClass' => '\Elasticsearch\Serializers\SmartSerializer',
-
+    'hosts' => [
+        '127.0.0.1:9200'
+    ],
     'sniffOnStart' => false,
     'connectionParams' => array(),
     'logging' => false,

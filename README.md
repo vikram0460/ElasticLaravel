@@ -51,7 +51,7 @@ OR
 
 - Add the service provider to your `app/config/app.php` file, inside the `providers` array: `'Fadion\Bouncy\BouncyServiceProvider'`
 
-- Publish the config file by running the following command in the terminal: `php artisan config:publish fadion/bouncy`
+- Publish the config file by running the following command in the terminal: `php artisan vendor:publish --provider="Fadion\Bouncy\BouncyServiceProvider"`
 
 - Edit the config files (located in `app/config/packages/bouncy/`) and set the Elasticsearch index name, server configuration, etc.
 
