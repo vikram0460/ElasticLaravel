@@ -84,115 +84,6 @@ class Product extends Eloquent {
 
 }
 ```
-
-## Indexing
-
-Before doing any search query, Elasticsearch needs an index to work on. What's normally a tedious task, is rendered as easy as it gets.
-
-Index all records:
-```php
-Product::all()->index();
-```
-
-Index a collection of models:
-```php
-Product::where('sold', true)->get()->index();
-```
-
-Index an individual model:
-```php
-$product = Product::find(10);
-$product->index();
-```
-
-Collection indexes will be added in bulk, which Elasticsearch handles quite fast. However, keep in mind that indexing a big collection is an exhaustive process. Hitting the SQL database and iterating over each row needs time and resources, so try to keep the collection relatively small. You'll have to experiment with the number of data you can index at a time, depending on your server resources and configuration.
-
-## Updating Indexes
-
-Updating is the safe way, in version conflict terms, to reindex an existing document. When the model exists and any of it's attributes have changed, it's index will be updated. Otherwise, it will be added to the index as if calling the `index()` method. 
-
-Updating a model's index:
-```php
-$product = Product::find(10);
-$product->price = 100;
-$product->updateIndex();
-```
-
-Updating a model's index using custom attributes. There are few use cases for this, as it's preferable to keep models and indexes in sync, but it's there when needed.
-```php
-$product = Product::find(10);
-$product->updateIndex([
-    'price' => 120,
-    'sold' => false
-]);
-```
-
-## Removing Indexes
-
-When you're done with a model's index, obviously you can remove it.
-
-Removing the indexes of a collection:
-```php
-Product::where('quantity', '<', 25)->get()->removeIndex();
-```
-
-Removing the index of a single model:
-```php
-$product = Product::find(10);
-$product->removeIndex();
-```
-
-The method is intentionally called 'remove' instead of 'delete', so you don't mistake it with Eloquent's delete() method.
-
-## Re-indexing
-
-A convenience method that actually removes and adds the index again. It is most useful when you want a document to get a fresh index, resetting version information.
-
-Reindexing a collection:
-```php
-Product::where('condition', 'new')->get()->reindex();
-```
-
-Reindexing a single model:
-```php
-$product = Product::find(10);
-$product->reindex();
-```
-
-## Concurrency Control
-
-Elasticsearch assumes that no document conflict will arise during indexing and as such, it doesn't provide automatic concurrency control. However, it does provide version information on documents that can be used to ensure that an older document doesn't override a newer one. This is the suggested technique described in the manual.
-
-Bouncy provides a single method for indexing by checking the version. It will only update the index if the version specified matches the one in the document, or return false otherwise. Obviously, it is concurrency-safe.
-
-```php
-$product = Product::find(10);
-$product->indexWithVersion(3);
-```
-
-## Automatic Indexes
-
-Bouncy knows when a model is created, saved or deleted and it will reflect those changes to the indexes. Except for the initial index creation of an existing database, you'll generally won't need to use the above methods to manipulate indexes. Any new model's index will be added automatically, will be updated on save and removed when the model is deleted.
-
-You can disable automatic indexes altogether by setting the `auto_index` config option to `false`. Doing so, it is up to you to sync your database to the index.
-
-The only cases where Bouncy can't update or delete indexes are when doing mass updates or deletes. Those queries run directly on the query builder and it's impossible to override them. I'm investigating for a good way of doing this, but for now, the following queries don't reflect changes on indexes:
-
-```php
-Product::where('price', 100)->update(['price' => 110]);
-// or
-Product::where('price', 100)->delete();
-```
-
-You can still call the indexing methods manually and work the limitation. It will add an extra database query, but at least it will keep your data in sync.
-```php
-Product::where('price', 100)->get()->updateIndex(['price' => 110]);
-Product::where('price', 100)->update(['price' => 110]);
-// or
-Product::where('price', 100)->get()->removeIndex();
-Product::where('price', 100)->delete();
-```
-
 ## Mappings
 
 Mappings can be created as easily as anything you've seen until now. They are defined as a class property of a model and handled using some simple methods.
@@ -207,43 +98,175 @@ class Product extends Eloquent {
     
     protected $mappingProperties = [
         'title' => [
-            'type' => 'string',
-            'store' => true
+            'type' => 'keyword'
         ],
         'description' => [
-            'type' => 'string',
-            'index' => 'analyzed'
+            'type' => 'text',
+            'fielddata' => true
+        ],
+        'created_at' => [
+            'type' => 'date',
+            'format' => 'yyyy-MM-dd HH:mm:ss'
         ]
     ]
     
 }
 ```
 
+## Customizing Document Fields
+
+YOu need to have documentFields in order to have the columns indexed:
+
+```php
+use Fadion\Bouncy\BouncyTrait;
+
+class Product extends Eloquent {
+    
+    use BouncyTrait;
+    
+    public function documentFields()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => 'description',
+            'created_at' => ($this->created_at != '') ? Carbon::parse($this->created_at)->toDateTimeString(): null,
+        ];
+    };
+
+}
+```
+
+## Indexing And Mapping
+
+After all the above steps, now you need to create the indexing for the your model then map.
+```php
+App\Product::createIndex();
+```
+
 Put those mappings:
 ```php
-Product::putMapping();
+App\Product::putMapping();
 ```
 
 Get mappings:
 ```php
-Product::getMapping();
-```
-
-Delete mappings:
-```php
-Product::deleteMapping();
-```
-
-Rebuild (delete and put again) mappings:
-```php
-Product::rebuildMapping();
+App\Product::getMapping();
 ```
 
 Check if mappings exist:
 ```php
-if (Product::hasMapping()) {
+if (App\Product::hasMapping()) {
     // do something
 }
+```
+
+## Indexing
+
+Before doing any search query, Elasticsearch needs an index to work on. What's normally a tedious task, is rendered as easy as it gets.
+
+Index all records:
+```php
+App\Product::all()->index();
+```
+
+Index a collection of models:
+```php
+App\Product::where('sold', true)->get()->index();
+```
+
+Index an individual model:
+```php
+$product = App\Product::find(10);
+$product->index();
+```
+
+Collection indexes will be added in bulk, which Elasticsearch handles quite fast. However, keep in mind that indexing a big collection is an exhaustive process. Hitting the SQL database and iterating over each row needs time and resources, so try to keep the collection relatively small. You'll have to experiment with the number of data you can index at a time, depending on your server resources and configuration.
+
+## Updating Indexes
+
+Updating is the safe way, in version conflict terms, to reindex an existing document. When the model exists and any of it's attributes have changed, it's index will be updated. Otherwise, it will be added to the index as if calling the `index()` method. 
+
+Updating a model's index:
+```php
+$product = App\Product::find(10);
+$product->price = 100;
+$product->updateIndex();
+```
+
+Updating a model's index using custom attributes. There are few use cases for this, as it's preferable to keep models and indexes in sync, but it's there when needed.
+```php
+$product = App\Product::find(10);
+$product->updateIndex([
+    'price' => 120,
+    'sold' => false
+]);
+```
+
+## Removing Indexes
+
+When you're done with a model's index, obviously you can remove it.
+
+Removing the indexes of a collection:
+```php
+App\Product::where('quantity', '<', 25)->get()->removeIndex();
+```
+
+Removing the index of a single model:
+```php
+$product = App\Product::find(10);
+$product->removeIndex();
+```
+
+The method is intentionally called 'remove' instead of 'delete', so you don't mistake it with Eloquent's delete() method.
+
+## Re-indexing
+
+A convenience method that actually removes and adds the index again. It is most useful when you want a document to get a fresh index, resetting version information.
+
+Reindexing a collection:
+```php
+App\Product::where('condition', 'new')->get()->reindex();
+```
+
+Reindexing a single model:
+```php
+$product = App\Product::find(10);
+$product->reindex();
+```
+
+## Concurrency Control
+
+Elasticsearch assumes that no document conflict will arise during indexing and as such, it doesn't provide automatic concurrency control. However, it does provide version information on documents that can be used to ensure that an older document doesn't override a newer one. This is the suggested technique described in the manual.
+
+Bouncy provides a single method for indexing by checking the version. It will only update the index if the version specified matches the one in the document, or return false otherwise. Obviously, it is concurrency-safe.
+
+```php
+$product = App\Product::find(10);
+$product->indexWithVersion(3);
+```
+
+## Automatic Indexes
+
+Bouncy knows when a model is created, saved or deleted and it will reflect those changes to the indexes. Except for the initial index creation of an existing database, you'll generally won't need to use the above methods to manipulate indexes. Any new model's index will be added automatically, will be updated on save and removed when the model is deleted.
+
+You can disable automatic indexes altogether by setting the `auto_index` config option to `false`. Doing so, it is up to you to sync your database to the index.
+
+The only cases where Bouncy can't update or delete indexes are when doing mass updates or deletes. Those queries run directly on the query builder and it's impossible to override them. I'm investigating for a good way of doing this, but for now, the following queries don't reflect changes on indexes:
+
+```php
+App\Product::where('price', 100)->update(['price' => 110]);
+// or
+App\Product::where('price', 100)->delete();
+```
+
+You can still call the indexing methods manually and work the limitation. It will add an extra database query, but at least it will keep your data in sync.
+```php
+App\Product::where('price', 100)->get()->updateIndex(['price' => 110]);
+App\Product::where('price', 100)->update(['price' => 110]);
+// or
+App\Product::where('price', 100)->get()->removeIndex();
+App\Product::where('price', 100)->delete();
 ```
 
 ## Searching
@@ -261,7 +284,7 @@ $params = [
     'size' => 20
 ];
 
-$products = Product::search($params);
+$products = App\Product::search($params);
 
 foreach ($products as $product) {
     echo $product->title;
@@ -276,12 +299,12 @@ Paginated results are important in an application and it's generally a pain with
 
 Paginate to 15 models per page (default):
 ```php
-$products = Product::search($params)->paginate();
+$products = App\Product::search($params)->paginate();
 ```
 
 Paginate to an arbitrary number:
 ```php
-$products = Product::search($params)->paginate(30);
+$products = App\Product::search($params)->paginate(30);
 ```
 
 In your views, you can show pagination links exactly as you've done before:
@@ -296,7 +319,7 @@ For performance, limiting your search results should be done on the Elasticsearc
 
 Limit to 50 results:
 ```php
-$products = Product::search($params)->limit(50);
+$products = App\Product::search($params)->limit(50);
 ```
 
 ## Results Information
@@ -304,7 +327,7 @@ $products = Product::search($params)->limit(50);
 Elasticsearch provides some information for the query, as the total number of hits or time taken. Bouncy's results collections have methods for easily accessing that information.
 
 ```php
-$products = Product::search($params);
+$products = App\Product::search($params);
 
 $products->total(); // Total number of hits
 $products->maxScore(); // Maximum score of the results
@@ -320,7 +343,7 @@ $products->shards($key); // Information on specific shard
 Elasticsearch documents have some information such as score and version. You can access those data using the following methods:
 
 ```php
-$products = Product::search($params);
+$products = App\Product::search($params);
 
 foreach ($products as $product) {
     $product->isDocument(); // Checks if it's an Elasticsearch document
@@ -347,7 +370,7 @@ $params = [
     ]
 ];
 
-$products = Product::search($params);
+$products = App\Product::search($params);
 
 foreach ($products as $product) {
     echo $product->highlight('title');
@@ -362,55 +385,32 @@ Having flexibility and all is great, but there are occassions when you just need
 
 match query:
 ```php
-$products = Product::match($title, $query)
+$products = App\Product::match($title, $query)
 ```
 
 multi_match query:
 ```php
-$products = Product::multiMatch(Array $fields, $query)
+$products = App\Product::multiMatch(Array $fields, $query)
 ```
 
 fuzzy query:
 ```php
-$products = Product::fuzzy($field, $value, $fuzziness = 'AUTO')
+$products = App\Product::fuzzy($field, $value, $fuzziness = 'AUTO')
 ```
 
 geoshape query:
 ```php
-$products = Product::geoshape($field, Array $coordinates, $type = 'envelope')
+$products = App\Product::geoshape($field, Array $coordinates, $type = 'envelope')
 ```
 
 ids query:
 ```php
-$products = Product::ids(Array $values)
+$products = App\Product::ids(Array $values)
 ```
 
 more_like_this query
 ```php
-$products = Product::moreLikeThis(Array $fields, Array $ids, $minTermFreq = 1, $percentTermsToMatch = 0.5, $minWordLength = 3)
-```
-
-## Customizing Document Fields
-
-Bouncy will use your model's attributes while indexing and that should be fine for most cases. However, if you want to have control over the Elasticsearch documents structure, you can customize the fields by adding a `$documentFields` method to your model:
-
-```php
-use Fadion\Bouncy\BouncyTrait;
-
-class Product extends Eloquent {
-    
-    use BouncyTrait;
-    
-    public function documentFields()
-    {
-        return [
-            'id' => $this->id,
-            'price' => $this->price,
-            'rating' => 'perfect'
-        ];
-    };
-
-}
+$products = App\Product::moreLikeThis(Array $fields, Array $ids, $minTermFreq = 1, $percentTermsToMatch = 0.5, $minWordLength = 3)
 ```
 
 ## Custom Collection

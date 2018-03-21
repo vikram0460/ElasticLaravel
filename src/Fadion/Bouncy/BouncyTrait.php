@@ -48,6 +48,21 @@ trait BouncyTrait {
     }
 
     /**
+     * To create the index
+     */
+    public static function createIndex()
+    {
+        $instance = new static;
+        $params = [
+            'index' => $instance->getIndex()
+        ];
+        
+        $response = $instance->getElasticClient()->indices()->create($params);
+        
+        return $response;
+    }
+    
+    /**
      * Builds an arbitrary query.
      *
      * @param array $body
@@ -60,8 +75,35 @@ trait BouncyTrait {
         $params['body'] = $body;
 
         $response = $instance->getElasticClient()->search($params);
-
+        
         return new ElasticCollection($response, $instance);
+    }
+    
+    /**
+     * Builds an arbitrary query.
+     *
+     * @param array $body
+     * @return ElasticCollection
+     */
+    public static function searchScroll(Array $body)
+    {
+        $instance = new static;
+        $params = $instance->basicElasticParams();
+        $params['body'] = $body;
+    
+        $response = $instance->getElasticClient()->search($params);
+        
+        while (isset($response['hits']['hits']) && count($response['hits']['hits']) > 0) {
+            $scrollId = $response['_scroll_id'];
+            // Execute a Scroll request and repeat
+            $scrollParams = [
+                                "scroll_id" => $scrollId,  //...using our previously obtained _scroll_id
+                                "scroll" => "1m"           // and the same timeout window
+                            ];
+            $response = $instance->getElasticClient()->scroll($scrollParams);
+            
+            return new ElasticCollection($response, $instance);
+        }
     }
 
     /**
@@ -235,21 +277,9 @@ trait BouncyTrait {
         );
 
         $mapping['body'][$instance->getTypeName()] = $params;
-
+        
+        
         return $instance->getElasticClient()->indices()->putMapping($mapping);
-    }
-
-    /**
-     * Deletes mappings.
-     *
-     * @return array
-     */
-    public static function deleteMapping()
-    {
-        $instance = new static;
-        $params = $instance->basicElasticParams();
-
-        return $instance->getElasticClient()->indices()->deleteMapping($params);
     }
 
     /**
@@ -263,22 +293,6 @@ trait BouncyTrait {
         $mapping = $instance->getMapping();
 
         return (empty($mapping)) ? false : true;
-    }
-
-    /**
-     * Rebuilds mappings.
-     *
-     * @return array
-     */
-    public static function rebuildMapping()
-    {
-        $instance = new static;
-
-        if ($instance->hasMapping()) {
-            $instance->deleteMapping();
-        }
-
-        return $instance->putMapping();
     }
 
     /**
