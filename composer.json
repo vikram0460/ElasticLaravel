@@ -10,7 +10,9 @@
             "homepage": "http://www.streha.al"
         },
 		{
-            "name": "Vikram"
+            "name": "Vikram",
+            "email": "vontaryvikramreddy@gmail.com",
+            "homepage": "http://phptechworld.blogspot.com/"
         }
     ],
     "require": {
@@ -24,5 +26,5 @@
             "Fadion\\Bouncy": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "1.1"
 }

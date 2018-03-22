@@ -2,16 +2,12 @@
 
 return array(
 
-    'registeredNamespaces' => [
-        'connectionClass' => '\Elasticsearch\Connections\GuzzleConnection',
-        'connectionFactoryClass' => '\Elasticsearch\Connections\ConnectionFactory',
-    ],
+	'connectionClass' => '\Elasticsearch\Connections\GuzzleConnection',
+	'connectionFactoryClass' => '\Elasticsearch\Connections\ConnectionFactory',
     'connectionPoolClass' => '\Elasticsearch\ConnectionPool\StaticNoPingConnectionPool',
     'selectorClass' => '\Elasticsearch\ConnectionPool\Selectors\StickyRoundRobinSelector',
     'serializerClass' => '\Elasticsearch\Serializers\SmartSerializer',
-    'hosts' => [
-        '127.0.0.1:9200'
-    ],
+    'hosts' => ['127.0.0.1:9200'],
     'sniffOnStart' => false,
     'connectionParams' => array(),
     'logging' => false,
@@ -22,9 +18,7 @@ return array(
     'tracePath' => storage_path().'/logs/elasticsearch_trace.log',
     'traceLevel' => Monolog\Logger::WARNING,
     'guzzleOptions' => array(),
-    'connectionPoolParams' => array(
-        'randomizeHosts' => true
-    ),
+    'connectionPoolParams' => [ 'randomizeHosts' => true],
     'retries' => null
 
 );

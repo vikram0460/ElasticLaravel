@@ -1,15 +1,12 @@
 # Bouncy
-This is my first repository forked from https://github.com/fadion/Bouncy.
-
-As I like this plug-in much I am trying to make this is compatible to ES6. Still in begining stages as at the moment. If I can succeed I will update here.
-
-# Bouncy
 
 Elasticsearch is a great search engine, but it takes some work to transform its results to an easy to use dataset. Bouncy does exactly that: it maps Elasticsearch results to Eloquent models, so you can keep using the same logic with some special enhancements. In addition, it handles indexing, either manually or automatically on model creation, update or deletion.
 
 This package was created for a personal project and it's still a work in progress. I don't expect it's API to change however.
 
-I was inspired and most of the implementation is based on [Elasticquent](https://github.com/adamfairholm/Elasticquent/). Basically, it's a rewritten fork of that package. Kudos to the developers.
+I was inspired and most of the implementation is based on [Bouncy](https://github.com/fadion/Bouncy). Basically, it's a fork of that package. Kudos to the developer. 
+Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
+
 
 ## Table of Contents
 
@@ -36,7 +33,7 @@ I was inspired and most of the implementation is based on [Elasticquent](https:/
 
 ## Installation
 
-composer require vikram/es:dev-master
+composer require vikram/es
 
 OR
 
@@ -113,7 +110,7 @@ class Product extends Eloquent {
 
 ## Customizing Document Fields
 
-YOu need to have documentFields in order to have the columns indexed:
+You need to have documentFields in order to have the columns indexed:
 
 ```php
 use Fadion\Bouncy\BouncyTrait;
@@ -128,7 +125,7 @@ class Product extends Eloquent {
             'id' => $this->id,
             'title' => $this->title,
             'description' => 'description',
-            'created_at' => ($this->created_at != '') ? Carbon::parse($this->created_at)->toDateTimeString(): null,
+            'created_at' => ($this->created_at != '') ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s'): null,
         ];
     };
 

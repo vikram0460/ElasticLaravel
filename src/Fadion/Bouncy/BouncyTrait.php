@@ -62,7 +62,7 @@ trait BouncyTrait {
         return $response;
     }
 	
-	/**
+    /**
      * To delete the index
      */
     public static function deleteIndex()
