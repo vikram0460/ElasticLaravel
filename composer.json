@@ -26,5 +26,5 @@
             "Fadion\\Bouncy": "src/"
         }
     },
-    "minimum-stability": "1.1"
+    "minimum-stability": "beta"
 }

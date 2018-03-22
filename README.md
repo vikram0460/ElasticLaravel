@@ -33,7 +33,7 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
 
 ## Installation
 
-composer require vikram/es
+composer require vikram/es:beta-master
 
 OR
 
@@ -41,7 +41,7 @@ OR
 ```json
 {
     "require": {
-        "vikram/es": "dev-master",
+        "vikram/es": "beta-master",
     }
 }
 ```
