@@ -61,6 +61,21 @@ trait BouncyTrait {
         
         return $response;
     }
+	
+	/**
+     * To delete the index
+     */
+    public static function deleteIndex()
+    {
+        $instance = new static;
+        $params = [
+            'index' => $instance->getIndex()
+        ];
+        
+        $response = $instance->getElasticClient()->indices()->delete($params);
+        
+        return $response;
+    }
     
     /**
      * Builds an arbitrary query.
