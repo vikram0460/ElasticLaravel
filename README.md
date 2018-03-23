@@ -19,7 +19,8 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
     * [Re-indexing](#re-indexing)
     * [Concurrency Control](#concurrency-control)
     * [Automatic Indexes](#automatic-indexes)
-* [Mappings](#mappings)
+* [Mappings And Customizing Document Fields](#mappings-customizing-document-fields)
+* [Indexing And Mapping](#indexing-and-mapping)
 * [Searching](#searching)
     * [Pagination](#pagination)
     * [Limit](#limit)
@@ -27,7 +28,6 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
     * [Document Information](#document-information)
     * [Highlights](#highlights)
     * [Searching Shorthands](#searching-shorthands)
-* [Customizing Document Fields](#customizing-document-fields)
 * [Custom Collection](#custom-collection)
 * [Elasticsearch Client Facade](#elasticsearch-client-facade)
 
@@ -79,13 +79,14 @@ class Product extends Eloquent {
 
 }
 ```
-## Mappings
+## Mappings And Customizing Document Fields
 
 Mappings can be created as easily as anything you've seen until now. They are defined as a class property of a model and handled using some simple methods.
 
 Add mapping properties to a model:
 ```php
 use Fadion\Bouncy\BouncyTrait;
+use Carbon\Carbon;
 
 class Product extends Eloquent {
     
@@ -105,21 +106,10 @@ class Product extends Eloquent {
         ]
     ]
     
-}
-```
-
-## Customizing Document Fields
-
-You need to have documentFields in order to have the columns indexed:
-
-```php
-use Fadion\Bouncy\BouncyTrait;
-
-class Product extends Eloquent {
-    
-    use BouncyTrait;
-    
-    public function documentFields()
+	/**
+	 * You need to have documentFields in order to have the columns indexed
+	 */
+	public function documentFields()
     {
         return [
             'id' => $this->id,
@@ -128,7 +118,6 @@ class Product extends Eloquent {
             'created_at' => ($this->created_at != '') ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s'): null,
         ];
     };
-
 }
 ```
 
