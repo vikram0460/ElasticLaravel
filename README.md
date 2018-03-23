@@ -19,7 +19,7 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
     * [Re-indexing](#re-indexing)
     * [Concurrency Control](#concurrency-control)
     * [Automatic Indexes](#automatic-indexes)
-* [Mappings And Customizing Document Fields](#mappings-customizing-document-fields)
+* [Mappings And Customizing Document Fields](#mappings-and-customizing-document-fields)
 * [Indexing And Mapping](#indexing-and-mapping)
 * [Searching](#searching)
     * [Pagination](#pagination)
@@ -106,10 +106,10 @@ class Product extends Eloquent {
         ]
     ]
     
-	/**
-	 * You need to have documentFields in order to have the columns indexed
-	 */
-	public function documentFields()
+    /**
+     * You need to have documentFields in order to have the columns indexed
+     */
+    public function documentFields()
     {
         return [
             'id' => $this->id,
@@ -117,7 +117,7 @@ class Product extends Eloquent {
             'description' => 'description',
             'created_at' => ($this->created_at != '') ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s'): null,
         ];
-    };
+    }
 }
 ```
 
