@@ -402,6 +402,24 @@ more_like_this query
 $products = App\Product::moreLikeThis(Array $fields, Array $ids, $minTermFreq = 1, $percentTermsToMatch = 0.5, $minWordLength = 3)
 ```
 
+## Scroll
+The Scrolling functionality of Elasticsearch is used to paginate over many documents in a bulk manner, such as exporting all the documents belonging to a single user. It is more efficient than regular search because it doesn’t need to maintain an expensive priority queue ordering the documents.
+[Reference](https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/_search_operations.html#_scrolling)
+
+$params =	[
+	'query' => [
+		'match_all' => new \stdClass()
+	]
+];
+
+// how long between scroll requests. should be small!
+$scrollTime = "30s"; 
+
+// how many results *per shard* you want back
+$size =  10000;
+
+$products = App\Product::scroll($params, $scrollTime, $size);
+
 ## Custom Collection
 
 If you are using a custom collection for Eloquent, you can still keep using Bouncy's methods. You'll just need to add a trait to your collection class.

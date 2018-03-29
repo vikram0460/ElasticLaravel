@@ -95,25 +95,28 @@ trait BouncyTrait {
     }
     
     /**
-     * Builds an arbitrary query.
-     *
+     * Builds an arbitrary query with scroll.
      * @param array $body
+     * @param unknown $scrollTime
+     * @param unknown $size
      * @return ElasticCollection
      */
-    public static function searchScroll(Array $body)
+    public static function scroll(Array $body, $scrollTime, $size)
     {
         $instance = new static;
         $params = $instance->basicElasticParams();
         $params['body'] = $body;
-    
+        $params['scroll'] = $scrollTime; // how long between scroll requests. should be small!
+        $params['size'] = $size; // how many results *per shard* you want back
+        
         $response = $instance->getElasticClient()->search($params);
         
         while (isset($response['hits']['hits']) && count($response['hits']['hits']) > 0) {
             $scrollId = $response['_scroll_id'];
             // Execute a Scroll request and repeat
             $scrollParams = [
-                                "scroll_id" => $scrollId,  //...using our previously obtained _scroll_id
-                                "scroll" => "1m"           // and the same timeout window
+                                "scroll_id" => $scrollId, //...using our previously obtained _scroll_id
+                                "scroll" => $scrollTime   // and the same timeout window
                             ];
             $response = $instance->getElasticClient()->scroll($scrollParams);
             
