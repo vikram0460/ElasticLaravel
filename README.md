@@ -406,6 +406,7 @@ $products = App\Product::moreLikeThis(Array $fields, Array $ids, $minTermFreq = 
 The Scrolling functionality of Elasticsearch is used to paginate over many documents in a bulk manner, such as exporting all the documents belonging to a single user. It is more efficient than regular search because it doesn’t need to maintain an expensive priority queue ordering the documents.
 [Reference](https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/_search_operations.html#_scrolling)
 
+```php
 $params =	[
 	'query' => [
 		'match_all' => new \stdClass()
@@ -419,6 +420,7 @@ $scrollTime = "30s";
 $size =  10000;
 
 $products = App\Product::scroll($params, $scrollTime, $size);
+```
 
 ## Custom Collection
 
