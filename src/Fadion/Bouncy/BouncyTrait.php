@@ -433,39 +433,6 @@ trait BouncyTrait {
     }
 
     /**
-     * Runs indexing functions before calling
-     * Eloquent's save() method.
-     *
-     * @param array $options
-     * @return mixed
-     */
-    public function save(Array $options = array())
-    {
-        if (Config::get('bouncy.auto_index')) {
-            $params = $this->basicElasticParams(true);
-
-            // When creating a model, Eloquent still
-            // uses the save() method. In this case,
-            // the field still doesn't have an id, so
-            // it is saved first, and then indexed.
-            if (! isset($params['id'])) {
-                $saved = parent::save($options);
-                $this->index();
-
-                return $saved;
-            }
-
-            // When updating fails, it means that the
-            // index doesn't exist, so it is created.
-            if (! $this->updateIndex()) {
-                $this->index();
-            }
-        }
-
-        return parent::save($options);
-    }
-
-    /**
      * Deletes the index before calling Eloquent's
      * delete method.
      *
