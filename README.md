@@ -422,6 +422,36 @@ $size =  10000;
 $products = App\Product::scroll($params, $scrollTime, $size);
 ```
 
+## Suggest
+The suggest functionality of Elasticsearch is used to suggest when we search the text, which requires different mapping
+[Reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters-completion.html)
+
+```php
+$mappingProperties = [
+						'name' => [
+							'type' => 'completion'
+						]
+					 ];
+
+$searchText = 'a'; // example
+$params = [
+                'suggest' => [
+                    'name-suggest' => [
+                        'prefix' => $searchText,
+                        'completion' => [
+                            'field' => 'name',
+                            'size' => 10,
+                        ]
+                    ]
+                ]
+            ];
+$productsCollection = App\Product::suggest($params);			
+// To get the products from the code
+$products = $productsCollection['suggest']['name-suggest'][0]['options'];
+
+```
+
+
 ## Custom Collection
 
 If you are using a custom collection for Eloquent, you can still keep using Bouncy's methods. You'll just need to add a trait to your collection class.

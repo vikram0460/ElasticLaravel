@@ -95,6 +95,24 @@ trait BouncyTrait {
     }
     
     /**
+     * Builds an arbitrary query.
+     *
+     * @param array $body
+     * @return ElasticCollection
+     */
+    public static function suggest(Array $body)
+    {
+        
+        $instance = new static;
+        $params = $instance->basicElasticParams();
+        $params['body'] = $body;
+
+        $response = $instance->getElasticClient()->search($params);
+        
+        return $response;
+    }
+    
+    /**
      * Builds an arbitrary query with scroll.
      * @param array $body
      * @param unknown $scrollTime
@@ -295,7 +313,6 @@ trait BouncyTrait {
         );
 
         $mapping['body'][$instance->getTypeName()] = $params;
-        
         
         return $instance->getElasticClient()->indices()->putMapping($mapping);
     }
