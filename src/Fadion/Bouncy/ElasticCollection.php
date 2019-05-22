@@ -131,11 +131,20 @@ class ElasticCollection extends Collection {
         return $shards;
     }
 
+	/**
+     * Build a method to return aggregations
+     * @return multitype:unknown
+     */
+    public function aggregations()
+    {
+        return $this->response['aggregations'];
+    }
+	
     /**
      * Build a method to generate a aggregations fields with unique values
      * @return multitype:unknown
      */
-    public function aggregations()
+    public function getAggregationKeys()
     {
         $items = array();
         foreach ($this->response['aggregations']['all']['buckets'] as $keys) {
