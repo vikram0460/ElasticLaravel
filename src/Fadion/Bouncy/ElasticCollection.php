@@ -93,6 +93,20 @@ class ElasticCollection extends Collection {
     {
         return $this->response['hits']['max_score'];
     }
+    /**
+     *  score of the individual results.
+     *
+     * @return string
+     */
+    public function score($incrementValue =NULL)
+    {
+        if($incrementValue !=NULL){
+            return $this->response['hits']['hits'][$incrementValue]['_score'];
+        }else{
+            return $this->response['hits']['hits'][0]['_score'];
+        }
+        
+    }
 
     /**
      * Time in ms it took to run the query.
@@ -131,7 +145,7 @@ class ElasticCollection extends Collection {
         return $shards;
     }
 
-	/**
+    /**
      * Build a method to return aggregations
      * @return multitype:unknown
      */
@@ -139,7 +153,7 @@ class ElasticCollection extends Collection {
     {
         return $this->response['aggregations'];
     }
-	
+    
     /**
      * Build a method to generate a aggregations fields with unique values
      * @return multitype:unknown
