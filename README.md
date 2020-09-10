@@ -41,7 +41,7 @@ OR
 ```json
 {
     "require": {
-        "vikram/es": "dev-master",
+        "vikram/es": "^1.0",
     }
 }
 ```
