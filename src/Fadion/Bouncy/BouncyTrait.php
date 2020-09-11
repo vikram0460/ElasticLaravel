@@ -1,6 +1,7 @@
 <?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\Facades\Config;
+use Elasticsearch\ClientBuilder as ClientBuilder;
 use Elasticsearch\Client as ElasticSearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\Conflict409Exception;
@@ -611,15 +612,15 @@ trait BouncyTrait {
      */
     protected function getElasticClient()
     {
-        $configurations = Config::get('elasticsearch');
+        $configurations = config('elasticsearch');
         $retries = $configurations['retries'];
         $hosts = $configurations['hosts'];
         $connectionPool = $configurations['connectionPoolClass'];
         $selector = $configurations['selectorClass'];
         $serializer = $configurations['serializerClass'];
         $logPath = $configurations['logPath'];
-        $logger = ClientBuilder::defaultLogger($logPath);
-        $client = ClientBuilder::create()
+        $logger = \Elasticsearch\ClientBuilder::defaultLogger($logPath);
+	$client = \Elasticsearch\ClientBuilder::create()
                                 ->setHosts($hosts)        // Set the hosts
                                 ->setConnectionPool($connectionPool)
                                 ->setSerializer($serializer)
