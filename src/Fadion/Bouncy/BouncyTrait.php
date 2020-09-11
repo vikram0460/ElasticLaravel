@@ -1,15 +1,16 @@
 <?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\Facades\Config;
-use Elasticsearch\ClientBuilder as ClientBuilder;
 use Elasticsearch\Client as ElasticSearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\Conflict409Exception;
 use Carbon\Carbon;
 use Elasticsearch\Transport;
-use Elasticsearch\ClientBuilder;
+use Elasticsearch\ClientBuilder as ClientBuilder;
 use Psr\Log\LoggerInterface;
 use Elasticsearch\ConnectionPool\AbstractConnectionPool;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 trait BouncyTrait {
 
@@ -612,15 +613,20 @@ trait BouncyTrait {
      */
     protected function getElasticClient()
     {
-        $configurations = config('elasticsearch');
+        $configurations = Config::get('elasticsearch');
         $retries = $configurations['retries'];
         $hosts = $configurations['hosts'];
         $connectionPool = $configurations['connectionPoolClass'];
         $selector = $configurations['selectorClass'];
         $serializer = $configurations['serializerClass'];
         $logPath = $configurations['logPath'];
-        $logger = \Elasticsearch\ClientBuilder::defaultLogger($logPath);
-	$client = \Elasticsearch\ClientBuilder::create()
+      
+        // In order to set the logger
+        $log = new Logger('log');
+        $handler = new StreamHandler($logPath);
+        $logger = $log->pushHandler($handler); 
+        
+        $client =  ClientBuilder::create()
                                 ->setHosts($hosts)        // Set the hosts
                                 ->setConnectionPool($connectionPool)
                                 ->setSerializer($serializer)
