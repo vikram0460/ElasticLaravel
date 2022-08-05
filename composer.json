@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "illuminate/support": "6.*",
-        "illuminate/database": "6.*",
-        "elasticsearch/elasticsearch": "6.*"
+        "illuminate/support": "9.*",
+        "illuminate/database": "9.*",
+        "elasticsearch/elasticsearch": "8.*"
     },
     "autoload": {
         "psr-0": {
