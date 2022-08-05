@@ -35,6 +35,10 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
 
 composer require vikram/es
 
+## For Laravel 9
+
+composer require vikram/es:dev-L9
+
 OR
 
 - Add the package to your `composer.json` file and run `composer update`:
