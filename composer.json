@@ -18,7 +18,7 @@
 		}
 	],
 	"require" : {
-		"php" : ">=8.*",
+		"php" : "^8.*",
 		"illuminate/support" : "^11.0",
 		"illuminate/database" : "^11.0",
 		"elasticsearch/elasticsearch" : "8.8"
