@@ -54,12 +54,13 @@ trait BouncyTrait {
      */
     public static function createIndex()
     {
+	$client = ClientBuilder::create()->build();    
         $instance = new static;
         $params = [
             'index' => $instance->getIndex()
         ];
         
-        $response = $instance->getElasticClient()->indices()->create($params);
+        $response = $client->indices()->create($params);
         
         return $response;
     }
@@ -314,7 +315,7 @@ trait BouncyTrait {
             'properties'    => $instance->getMappingProperties()
         );
 
-        $mapping['body'][$instance->getTypeName()] = $params;
+        $mapping['body'] = $params;
         
         return $instance->getElasticClient()->indices()->putMapping($mapping);
     }
