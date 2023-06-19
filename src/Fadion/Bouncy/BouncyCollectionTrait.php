@@ -24,7 +24,6 @@ trait BouncyCollectionTrait {
             $params['body'][] = array(
                 'index' => array(
                     '_index' => $item->getIndex(),
-                    '_type' => $item->getTypeName(),
                     '_id' => $item->getKey()
                 )
             );
@@ -91,9 +90,6 @@ trait BouncyCollectionTrait {
         $logger = ClientBuilder::defaultLogger($logPath);
         $client = ClientBuilder::create()
                                 ->setHosts($hosts)        // Set the hosts
-                                ->setConnectionPool($connectionPool)
-                                ->setSerializer($serializer)
-                                ->setSelector($selector)
                                 ->setLogger($logger)      // Set the logger with a default logger
                                 ->build();
         
