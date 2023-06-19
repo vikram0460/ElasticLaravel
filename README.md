@@ -33,7 +33,7 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
 
 ## Installation
 
-composer require vikram/es
+composer require vikram/es:"dev-L10"
 
 OR
 
@@ -41,7 +41,7 @@ OR
 ```json
 {
     "require": {
-        "vikram/es": "^1.0",
+        "vikram/es": "dev-L10",
     }
 }
 ```
@@ -75,7 +75,6 @@ When you need to set the index or type name specifically, just add the following
 class Product extends Eloquent {
 
     protected $indexName = 'awesome_index';
-    protected $typeName = 'cool_type';
 
 }
 ```
