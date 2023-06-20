@@ -6,7 +6,7 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\Conflict409Exception;
 use Carbon\Carbon;
 use Elasticsearch\Transport;
-use Elasticsearch\ClientBuilder as ClientBuilder;
+use Elastic\Elasticsearch\ClientBuilder;
 use Psr\Log\LoggerInterface;
 use Elasticsearch\ConnectionPool\AbstractConnectionPool;
 use Monolog\Logger;
@@ -615,6 +615,7 @@ trait BouncyTrait {
     protected function getElasticClient()
     {
         $configurations = Config::get('elasticsearch');
+       // print_r($configurations);exit;
         $retries = $configurations['retries'];
         $hosts = $configurations['hosts'];
         $connectionPool = $configurations['connectionPoolClass'];
@@ -628,12 +629,10 @@ trait BouncyTrait {
         $logger = $log->pushHandler($handler); 
         
         $client =  ClientBuilder::create()
-                                ->setHosts($hosts)        // Set the hosts
-                                ->setConnectionPool($connectionPool)
-                                ->setSerializer($serializer)
-                                ->setSelector($selector)
-                                ->setLogger($logger) // Set the logger with a default logger
-                                ->build();
+                                    ->setHosts($hosts)        // Set the hosts
+                                    ->setHttpClientOptions($configurations)
+                                    ->setLogger($logger) // Set the logger with a default logger
+                                    ->build();
         
         return $client;
     }
