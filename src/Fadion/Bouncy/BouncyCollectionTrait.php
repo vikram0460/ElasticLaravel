@@ -52,8 +52,7 @@ trait BouncyCollectionTrait {
         foreach ($this->all() as $item) {
             $params['body'][] = array(
                 'delete' => array(
-                    '_index' => $item->getIndex(),
-                    '_type' => $item->getTypeName(),
+                    '_index' => $item->getIndex(),                    
                     '_id' => $item->getKey()
                 )
             );
