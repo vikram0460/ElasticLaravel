@@ -5,7 +5,7 @@ Elasticsearch is a great search engine, but it takes some work to transform its 
 This package was created for a personal project and it's still a work in progress. I don't expect it's API to change however.
 
 I was inspired and most of the implementation is based on [Bouncy](https://github.com/fadion/Bouncy). Basically, it's a fork of that package. Kudos to the developer. 
-Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
+Only fixes made to support Elasticsearch 9.x and Laravel 10/11/12.
 
 
 ## Table of Contents
@@ -33,7 +33,7 @@ Only fixes made to support the Elasticsearch 6.x and Laravel 5.6.
 
 ## Installation
 
-composer require vikram/es:"dev-L10"
+composer require vikram/es:"dev-L12"
 
 OR
 
@@ -41,7 +41,7 @@ OR
 ```json
 {
     "require": {
-        "vikram/es": "dev-L10",
+        "vikram/es": "dev-L12"
     }
 }
 ```
