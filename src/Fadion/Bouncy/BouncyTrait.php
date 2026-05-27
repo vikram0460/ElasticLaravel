@@ -1,14 +1,11 @@
 <?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\Facades\Config;
-use Elasticsearch\Client as ElasticSearch;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Elasticsearch\Common\Exceptions\Conflict409Exception;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Carbon\Carbon;
-use Elasticsearch\Transport;
 use Elastic\Elasticsearch\ClientBuilder;
 use Psr\Log\LoggerInterface;
-use Elasticsearch\ConnectionPool\AbstractConnectionPool;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -54,8 +51,8 @@ trait BouncyTrait {
      */
     public static function createIndex()
     {
-	$client = ClientBuilder::create()->build();    
         $instance = new static;
+        $client = $instance->getElasticClient();
         $params = [
             'index' => $instance->getIndex()
         ];
@@ -399,8 +396,11 @@ trait BouncyTrait {
         try {
             return $this->getElasticClient()->update($params);
         }
-        catch (Missing404Exception $e) {
-            return false;
+        catch (ClientResponseException $e) {
+            if ($e->getResponse()->getStatusCode() === 404) {
+                return false;
+            }
+            throw $e;
         }
     }
 
@@ -414,8 +414,11 @@ trait BouncyTrait {
         try {
             return $this->getElasticClient()->delete($this->basicElasticParams(true));
         }
-        catch (Missing404Exception $e) {
-            return false;
+        catch (ClientResponseException $e) {
+            if ($e->getResponse()->getStatusCode() === 404) {
+                return false;
+            }
+            throw $e;
         }
     }
 
@@ -444,11 +447,12 @@ trait BouncyTrait {
 
             return $this->getElasticClient()->index($params);
         }
-        catch (Missing404Exception $e) {
-            return false;
-        }
-        catch (Conflict409Exception $e) {
-            return false;
+        catch (ClientResponseException $e) {
+            $status = $e->getResponse()->getStatusCode();
+            if ($status === 404 || $status === 409) {
+                return false;
+            }
+            throw $e;
         }
     }
 
@@ -596,8 +600,7 @@ trait BouncyTrait {
     protected function basicElasticParams($withId = false)
     {
         $params = array(
-            'index' => $this->getIndex(),
-            'type' => $this->getTypeName()
+            'index' => $this->getIndex()
         );
 
         if ($withId and $this->getKey()) {
@@ -610,18 +613,14 @@ trait BouncyTrait {
     /**
      * Returns an Elasticsearch\Client instance.
      *
-     * @return ElasticSearch
+     * @return Client
      */
     protected function getElasticClient()
     {
         $configurations = Config::get('elasticsearch');
        // print_r($configurations);exit;
-        $retries = $configurations['retries'];
-        $hosts = $configurations['hosts'];
-        $connectionPool = $configurations['connectionPoolClass'];
-        $selector = $configurations['selectorClass'];
-        $serializer = $configurations['serializerClass'];
-        $logPath = $configurations['logPath'];
+        $hosts = $configurations['hosts'] ?? [];
+        $logPath = $configurations['logPath'] ?? storage_path('logs/elasticsearch.log');
       
         // In order to set the logger
         $log = new Logger('log');
@@ -629,10 +628,9 @@ trait BouncyTrait {
         $logger = $log->pushHandler($handler); 
         
         $client =  ClientBuilder::create()
-                                    ->setHosts($hosts)        // Set the hosts
-                                    ->setHttpClientOptions($configurations)
-                                    ->setLogger($logger) // Set the logger with a default logger
-                                    ->build();
+                                ->setHosts($hosts)        // Set the hosts
+                                ->setLogger($logger) // Set the logger with a default logger
+                                ->build();
         
         return $client;
     }
