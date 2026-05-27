@@ -81,7 +81,8 @@ class ElasticCollection extends Collection {
      */
     public function total()
     {
-        return $this->response['hits']['total'];
+        $total = $this->response['hits']['total'] ?? 0;
+        return is_array($total) ? ($total['value'] ?? 0) : $total;
     }
 
     /**
