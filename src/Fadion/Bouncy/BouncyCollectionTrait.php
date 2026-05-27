@@ -1,9 +1,10 @@
 <?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\Facades\Config;
-use Elasticsearch\Client as ElasticSearch;
 use Elastic\Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Client;
 use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 
 trait BouncyCollectionTrait {
@@ -77,17 +78,13 @@ trait BouncyCollectionTrait {
     /**
      * Returns an Elasticsearch\Client instance.
      *
-     * @return ElasticSearch
+     * @return Client
      */
     protected function getElasticClient()
     {
         $configurations = Config::get('elasticsearch');
-        $retries = $configurations['retries'];
-        $hosts = $configurations['hosts'];
-        $connectionPool = $configurations['connectionPoolClass'];
-        $selector = $configurations['selectorClass'];
-        $serializer = $configurations['serializerClass'];
-        $logPath = $configurations['logPath'];
+        $hosts = $configurations['hosts'] ?? [];
+        $logPath = $configurations['logPath'] ?? storage_path('logs/elasticsearch.log');
         $logger = self::defaultLogger($logPath);
         $client = ClientBuilder::create()
                                 ->setHosts($hosts)        // Set the hosts
@@ -99,10 +96,10 @@ trait BouncyCollectionTrait {
     
     /**
      * @param $path string
-     * @param int $level
+     * @param Level $level
      * @return \Monolog\Logger\Logger
      */
-    public static function defaultLogger($path, $level = Logger::WARNING)
+    public static function defaultLogger($path, $level = Level::Warning)
     {
         $log       = new Logger('log');
         $handler   = new StreamHandler($path, $level);
