@@ -1,7 +1,7 @@
 <?php namespace Fadion\Bouncy;
 
 use Illuminate\Support\ServiceProvider;
-use Elasticsearch\Client as ElasticSearch;
+use Elastic\Elasticsearch\ClientBuilder;
 
 class BouncyServiceProvider extends ServiceProvider {
 
@@ -38,7 +38,10 @@ class BouncyServiceProvider extends ServiceProvider {
         );
 
         $this->app->singleton('elastic', function($app) {
-            return new ElasticSearch($app['config']->get('elasticsearch'));
+            $config = $app['config']->get('elasticsearch') ?? [];
+            return ClientBuilder::create()
+                ->setHosts($config['hosts'] ?? [])
+                ->build();
         });
     }
 
