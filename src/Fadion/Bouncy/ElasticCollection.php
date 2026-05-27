@@ -31,7 +31,7 @@ class ElasticCollection extends Collection {
     public function paginate($perPage = 15)
     {
         $page   = Paginator::resolveCurrentPage() ?: 1;
-        $path   = URL::to('/').'/'.\Request::path();
+        $path   = URL::to('/').'/'.request()->path();
         $sliced = array_slice($this->items, ($page - 1) * $perPage, $perPage);
         $total  = count($this->items);
         return new LengthAwarePaginator($sliced, $total, $perPage, $page, compact('path'));
